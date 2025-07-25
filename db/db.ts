@@ -2,15 +2,19 @@
 Initializes the database connection and schema for the app.
 */
 
-import { profilesTable } from "@/db/schema"
+import { customers, profilesTable, transactions } from "./schema"
 import { config } from "dotenv"
 import { drizzle } from "drizzle-orm/postgres-js"
 import postgres from "postgres"
 
 config({ path: ".env.local" })
 
-const schema = { profiles: profilesTable }
+const dbSchema = {
+  profiles: profilesTable,
+  customers,
+  transactions
+}
 
 const client = postgres(process.env.DATABASE_URL!)
 
-export const db = drizzle(client, { schema })
+export const db = drizzle(client, { schema: dbSchema })
