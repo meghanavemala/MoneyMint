@@ -59,8 +59,6 @@ CREATE TYPE membership AS ENUM ('free', 'pro');
 CREATE TABLE IF NOT EXISTS public.profiles (
   user_id TEXT PRIMARY KEY NOT NULL,
   membership membership NOT NULL DEFAULT 'free',
-  stripe_customer_id TEXT,
-  stripe_subscription_id TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
 );

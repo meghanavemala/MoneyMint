@@ -1,11 +1,11 @@
 /*
-Contains server actions related to profiles in the DB.
+Contains server actions for profile management.
 */
 
 'use server';
 
 import { db } from '@/db/db';
-import { InsertProfile, profilesTable, SelectProfile } from '@/db/schema/profiles-schema';
+import { InsertProfile, SelectProfile, profilesTable } from '@/db/schema/profiles-schema';
 import { ActionState } from '@/types';
 import { eq } from 'drizzle-orm';
 
@@ -70,38 +70,6 @@ export async function updateProfileAction(
   } catch (error) {
     console.error('Error updating profile:', error);
     return { isSuccess: false, message: 'Failed to update profile' };
-  }
-}
-
-export async function updateProfileByStripeCustomerIdAction(
-  stripeCustomerId: string,
-  data: Partial<InsertProfile>
-): Promise<ActionState<SelectProfile>> {
-  try {
-    const [updatedProfile] = await db
-      .update(profilesTable)
-      .set(data)
-      .where(eq(profilesTable.stripeCustomerId, stripeCustomerId))
-      .returning();
-
-    if (!updatedProfile) {
-      return {
-        isSuccess: false,
-        message: 'Profile not found by Stripe customer ID',
-      };
-    }
-
-    return {
-      isSuccess: true,
-      message: 'Profile updated by Stripe customer ID successfully',
-      data: updatedProfile,
-    };
-  } catch (error) {
-    console.error('Error updating profile by stripe customer ID:', error);
-    return {
-      isSuccess: false,
-      message: 'Failed to update profile by Stripe customer ID',
-    };
   }
 }
 

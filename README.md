@@ -30,7 +30,6 @@ Follow me on [X](https://x.com/mckaywrigley) and subscribe to my [YouTube](https
 - Frontend: [Next.js](https://nextjs.org/docs), [Tailwind](https://tailwindcss.com/docs/guides/nextjs), [Shadcn](https://ui.shadcn.com/docs/installation), [Framer Motion](https://www.framer.com/motion/introduction/)
 - Backend: [PostgreSQL](https://www.postgresql.org/about/), [Supabase](https://supabase.com/), [Drizzle](https://orm.drizzle.team/docs/get-started-postgresql), [Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations)
 - Auth: [Clerk](https://clerk.com/)
-- Payments: [Stripe](https://stripe.com/)
 
 **Note**: While I _highly_ recommend using o1-pro for this workflow, you can also use o3-mini, Claude 3.5 Sonnet, Gemini 2.0 Pro, and DeepSeek r1 for cheaper alternatives. However, you _will_ run into issues with those other models in this particular workflow, so I recommend using o1-pro for this workflow if possible.
 
@@ -44,7 +43,6 @@ They all have free plans that you can use to get started, with the exception of 
 - Create a [GitHub](https://github.com/) account
 - Create a [Supabase](https://supabase.com/) account
 - Create a [Clerk](https://clerk.com/) account
-- Create a [Stripe](https://stripe.com/) account
 - Create a [Vercel](https://vercel.com/) account
 
 You will likely not need paid plans unless you are building a business.
