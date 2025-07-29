@@ -1,39 +1,44 @@
 /*
 This client component provides a theme switcher for the app.
+Handles hydration properly by avoiding server/client mismatches.
 */
 
-"use client"
+'use client';
 
-import { cn } from "@/lib/utils"
-import { Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
-import { HTMLAttributes, ReactNode } from "react"
+import { cn } from '@/lib/utils';
+import { Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { HTMLAttributes, ReactNode, useEffect, useState } from 'react';
 
 interface ThemeSwitcherProps extends HTMLAttributes<HTMLDivElement> {
-  children?: ReactNode
+  children?: ReactNode;
 }
 
 export const ThemeSwitcher = ({ children, ...props }: ThemeSwitcherProps) => {
-  const { setTheme, theme } = useTheme()
+  const { setTheme, theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  const handleChange = (theme: "dark" | "light") => {
-    localStorage.setItem("theme", theme)
-    setTheme(theme)
+  // Avoid hydration mismatch by only rendering after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleChange = (newTheme: 'dark' | 'light') => {
+    localStorage.setItem('theme', newTheme);
+    setTheme(newTheme);
+  };
+
+  // Don't render anything until mounted to avoid hydration mismatch
+  if (!mounted) {
+    return <div className={cn('p-1', props.className)} style={{ width: '24px', height: '24px' }} />;
   }
 
   return (
     <div
-      className={cn(
-        "p-1 hover:cursor-pointer hover:opacity-50",
-        props.className
-      )}
-      onClick={() => handleChange(theme === "light" ? "dark" : "light")}
+      className={cn('p-1 hover:cursor-pointer hover:opacity-50', props.className)}
+      onClick={() => handleChange(resolvedTheme === 'light' ? 'dark' : 'light')}
     >
-      {theme === "dark" ? (
-        <Moon className="size-6" />
-      ) : (
-        <Sun className="size-6" />
-      )}
+      {resolvedTheme === 'dark' ? <Moon className="size-6" /> : <Sun className="size-6" />}
     </div>
-  )
-}
+  );
+};

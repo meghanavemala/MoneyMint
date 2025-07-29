@@ -2,11 +2,11 @@
 Contains the utility functions for the app.
 */
 
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 /**
@@ -15,24 +15,21 @@ export function cn(...inputs: ClassValue[]) {
  * @param currency The currency symbol to use (default: '₹')
  * @returns Formatted currency string
  */
-export function formatCurrency(
-  amount: number | string,
-  currency: string = "₹"
-): string {
-  const num = typeof amount === "string" ? parseFloat(amount) : amount
+export function formatCurrency(amount: number | string, currency: string = '₹'): string {
+  const num = typeof amount === 'string' ? parseFloat(amount) : amount;
 
   // Handle invalid numbers
-  if (isNaN(num)) return `${currency}0.00`
+  if (isNaN(num)) return `${currency}0.00`;
 
   // Format as Indian Rupees (INR) with 2 decimal places
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   })
     .format(num)
-    .replace("₹", currency)
+    .replace('₹', currency);
 }
 
 /**
@@ -41,22 +38,19 @@ export function formatCurrency(
  * @param formatStr The format string (default: 'MMM d, yyyy')
  * @returns Formatted date string
  */
-export function formatDate(
-  date: string | Date,
-  formatStr: string = "MMM d, yyyy"
-): string {
+export function formatDate(date: string | Date, formatStr: string = 'MMM d, yyyy'): string {
   try {
-    const dateObj = typeof date === "string" ? new Date(date) : date
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
       // @ts-ignore - This is valid but TypeScript doesn't recognize it
-      formatMatcher: "best fit"
-    }).format(dateObj)
+      formatMatcher: 'best fit',
+    }).format(dateObj);
   } catch (error) {
-    console.error("Error formatting date:", error)
-    return "Invalid date"
+    console.error('Error formatting date:', error);
+    return 'Invalid date';
   }
 }
 
@@ -67,15 +61,15 @@ export function formatDate(
  */
 export function formatTime(date: string | Date): string {
   try {
-    const dateObj = typeof date === "string" ? new Date(date) : date
-    return new Intl.DateTimeFormat("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true
-    }).format(dateObj)
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    }).format(dateObj);
   } catch (error) {
-    console.error("Error formatting time:", error)
-    return "Invalid time"
+    console.error('Error formatting time:', error);
+    return 'Invalid time';
   }
 }
 
@@ -86,9 +80,9 @@ export function formatTime(date: string | Date): string {
  * @returns Truncated text with ellipsis if needed
  */
 export function truncateText(text: string, maxLength: number = 50): string {
-  if (!text) return ""
-  if (text.length <= maxLength) return text
-  return `${text.substring(0, maxLength)}...`
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+  return `${text.substring(0, maxLength)}...`;
 }
 
 /**
@@ -97,12 +91,12 @@ export function truncateText(text: string, maxLength: number = 50): string {
  * @returns A random alphanumeric string
  */
 export function generateId(length: number = 8): string {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-  let result = ""
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
   for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length))
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  return result
+  return result;
 }
 
 /**
@@ -111,11 +105,11 @@ export function generateId(length: number = 8): string {
  * @returns The string in title case
  */
 export function toTitleCase(str: string): string {
-  if (!str) return ""
+  if (!str) return '';
   return str.replace(
     /\w\S*/g,
-    txt => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
-  )
+    (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
+  );
 }
 
 /**
@@ -124,19 +118,19 @@ export function toTitleCase(str: string): string {
  * @returns Formatted phone number
  */
 export function formatPhoneNumber(phone: string): string {
-  if (!phone) return ""
+  if (!phone) return '';
   // Remove all non-digit characters
-  const cleaned = ("" + phone).replace(/\D/g, "")
+  const cleaned = ('' + phone).replace(/\D/g, '');
 
   // Check if the number has an international code
   if (cleaned.length > 10) {
     // Format as international number
-    return `+${cleaned.substring(0, cleaned.length - 10)} ${cleaned.substring(cleaned.length - 10, cleaned.length - 5)} ${cleaned.substring(cleaned.length - 5)}`
+    return `+${cleaned.substring(0, cleaned.length - 10)} ${cleaned.substring(cleaned.length - 10, cleaned.length - 5)} ${cleaned.substring(cleaned.length - 5)}`;
   } else if (cleaned.length === 10) {
     // Format as standard Indian mobile number
-    return `${cleaned.substring(0, 5)} ${cleaned.substring(5)}`
+    return `${cleaned.substring(0, 5)} ${cleaned.substring(5)}`;
   }
 
   // Return as is if it doesn't match expected formats
-  return phone
+  return phone;
 }

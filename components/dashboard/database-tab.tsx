@@ -1,379 +1,506 @@
-"use client"
+/*
+Database tab component for viewing customer overview, balances, and transaction history.
+Provides detailed customer management with search, filtering, and transaction viewing capabilities.
+*/
 
-import { useState, useEffect } from "react"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
-} from "@/components/ui/table"
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   Search,
   User,
   Phone,
-  DollarSign,
+  Mail,
+  MapPin,
   Calendar,
+  Download,
+  Eye,
+  EyeOff,
+  Loader2,
+  IndianRupee,
+  TrendingUp,
+  TrendingDown,
   Plus,
-  ArrowLeft
-} from "lucide-react"
+  Minus,
+  Filter,
+  X,
+  ChevronDown,
+  ChevronUp,
+  SortAsc,
+  SortDesc,
+  FileText,
+  BarChart3,
+  Users,
+  Wallet,
+  CreditCard,
+  Banknote,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Info,
+  ArrowLeft,
+} from 'lucide-react';
 import {
   getCustomersAction,
-  type CustomerWithTransactions
-} from "@/actions/finance-actions"
-import { type Customer } from "@/db/schema/finance-schema"
-import { toast } from "sonner"
-import { format } from "date-fns"
-import { formatCurrency } from "@/lib/utils"
+  getCustomerByIdAction,
+  type CustomerWithTransactions,
+  type CustomerWithBalance,
+} from '@/actions/finance-actions';
+import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { formatCurrency } from '@/lib/utils';
 
-type ViewMode = "list" | "details"
+type ViewMode = 'list' | 'details';
 
 export function DatabaseTab() {
-  const [customers, setCustomers] = useState<Customer[]>([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [viewMode, setViewMode] = useState<ViewMode>("list")
-  const [selectedCustomer, setSelectedCustomer] =
-    useState<CustomerWithTransactions | null>(null)
+  const [customers, setCustomers] = useState<CustomerWithBalance[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerWithTransactions | null>(null);
+  const [customerDetailsLoading, setCustomerDetailsLoading] = useState(false);
 
   useEffect(() => {
-    loadCustomers()
-  }, [])
+    loadCustomers();
+  }, []);
 
   const loadCustomers = async () => {
     try {
-      setLoading(true)
-      const result = await getCustomersAction()
+      setLoading(true);
+      const result = await getCustomersAction();
       if (result.isSuccess && result.data) {
-        setCustomers(result.data)
+        setCustomers(result.data);
       } else {
-        toast.error(result.error || "Failed to load customers")
-        setCustomers([]) // Set to empty array on error
+        toast.error(result.message || 'Failed to load customers');
+        setCustomers([]);
       }
     } catch (error) {
-      console.error("Error loading customers:", error)
-      toast.error("An error occurred while loading customers")
-      setCustomers([]) // Set to empty array on error
+      console.error('Error loading customers:', error);
+      toast.error('An error occurred while loading customers');
+      setCustomers([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
+  const loadCustomerDetails = async (customerId: string) => {
+    try {
+      setCustomerDetailsLoading(true);
+      const result = await getCustomerByIdAction(customerId);
+      if (result.isSuccess && result.data) {
+        setSelectedCustomer(result.data);
+        setViewMode('details');
+      } else {
+        toast.error(result.message || 'Failed to load customer details');
+      }
+    } catch (error) {
+      console.error('Error loading customer details:', error);
+      toast.error('An error occurred while loading customer details');
+    } finally {
+      setCustomerDetailsLoading(false);
+    }
+  };
+
+  const handleDownloadPDF = async (customer: CustomerWithTransactions) => {
+    try {
+      const { generateCustomerPDF } = await import('@/lib/utils/pdf-generator');
+      await generateCustomerPDF(customer, {
+        businessName: 'Sandeep Finance',
+        includeBalance: true,
+      });
+      toast.success('PDF downloaded successfully');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Failed to generate PDF');
+    }
+  };
 
   const filteredCustomers = customers.filter(
-    customer =>
+    (customer) =>
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      customer.phone?.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+      customer.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const handleCustomerSelect = async (customer: Customer) => {
-    try {
-      const response = await fetch(`/api/customers/${customer.id}`)
-      if (!response.ok) {
-        throw new Error("Failed to fetch customer details")
-      }
-      const customerWithTransactions = await response.json()
-      setSelectedCustomer(customerWithTransactions)
-      setViewMode("details")
-    } catch (error) {
-      console.error("Error fetching customer details:", error)
-      toast.error("Failed to load customer details")
-    }
+  const totalBalance = customers.reduce((sum, customer) => sum + (customer.balance || 0), 0);
+  const totalCredit = customers.reduce((sum, customer) => sum + (customer.total_credit || 0), 0);
+  const totalPaid = customers.reduce((sum, customer) => sum + (customer.total_paid || 0), 0);
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="size-8 animate-spin rounded-full border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
-  if (viewMode === "details" && selectedCustomer) {
+  if (viewMode === 'details' && selectedCustomer) {
     return (
-      <div className="space-y-4">
-        <Button
-          variant="outline"
-          onClick={() => setViewMode("list")}
-          className="gap-2"
-        >
-          <ArrowLeft className="size-4" />
-          Back to List
-        </Button>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setViewMode('list');
+                setSelectedCustomer(null);
+              }}
+            >
+              <ArrowLeft className="mr-2 size-4" />
+              Back to Customers
+            </Button>
+            <div>
+              <h3 className="text-2xl font-bold">{selectedCustomer.name}</h3>
+              <p className="text-muted-foreground">Customer Details & Transaction History</p>
+            </div>
+          </div>
+          <Button onClick={() => handleDownloadPDF(selectedCustomer)} className="ml-auto">
+            <Download className="mr-2 size-4" />
+            Download PDF
+          </Button>
+        </div>
 
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Customer Information Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <User className="size-5" />
+                <span>Customer Information</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <User className="size-4 text-muted-foreground" />
+                  <span className="font-medium">Name:</span>
+                  <span>{selectedCustomer.name}</span>
+                </div>
+                {selectedCustomer.phone && (
+                  <div className="flex items-center space-x-2">
+                    <Phone className="size-4 text-muted-foreground" />
+                    <span className="font-medium">Phone:</span>
+                    <span>{selectedCustomer.phone}</span>
+                  </div>
+                )}
+                {selectedCustomer.email && (
+                  <div className="flex items-center space-x-2">
+                    <Mail className="size-4 text-muted-foreground" />
+                    <span className="font-medium">Email:</span>
+                    <span>{selectedCustomer.email}</span>
+                  </div>
+                )}
+                {selectedCustomer.address && (
+                  <div className="flex items-center space-x-2">
+                    <MapPin className="size-4 text-muted-foreground" />
+                    <span className="font-medium">Address:</span>
+                    <span>{selectedCustomer.address}</span>
+                  </div>
+                )}
+                {selectedCustomer.notes && (
+                  <div className="flex items-center space-x-2">
+                    <FileText className="size-4 text-muted-foreground" />
+                    <span className="font-medium">Notes:</span>
+                    <span>{selectedCustomer.notes}</span>
+                  </div>
+                )}
+                <div className="flex items-center space-x-2">
+                  <Calendar className="size-4 text-muted-foreground" />
+                  <span className="font-medium">Customer Since:</span>
+                  <span>{format(new Date(selectedCustomer.created_at), 'MMM dd, yyyy')}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Financial Summary Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <IndianRupee className="size-5" />
+                <span>Financial Summary</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4">
+                <div className="flex items-center justify-between rounded-lg bg-red-50 p-3 dark:bg-red-950/20">
+                  <div className="flex items-center space-x-2">
+                    <TrendingUp className="size-4 text-red-600" />
+                    <span className="font-medium text-red-700 dark:text-red-300">Total Credit</span>
+                  </div>
+                  <span className="text-xl font-bold text-red-600">
+                    {formatCurrency(selectedCustomer.total_credit || 0)}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg bg-green-50 p-3 dark:bg-green-950/20">
+                  <div className="flex items-center space-x-2">
+                    <TrendingDown className="size-4 text-green-600" />
+                    <span className="font-medium text-green-700 dark:text-green-300">
+                      Total Paid
+                    </span>
+                  </div>
+                  <span className="text-xl font-bold text-green-600">
+                    {formatCurrency(selectedCustomer.total_paid || 0)}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg bg-blue-50 p-3 dark:bg-blue-950/20">
+                  <div className="flex items-center space-x-2">
+                    <IndianRupee className="size-4 text-blue-600" />
+                    <span className="font-medium text-blue-700 dark:text-blue-300">
+                      Outstanding Balance
+                    </span>
+                  </div>
+                  <span className="text-xl font-bold text-blue-600">
+                    {formatCurrency(selectedCustomer.balance || 0)}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Transaction History */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-2xl">
-                  {selectedCustomer.name}
-                </CardTitle>
-                <CardDescription>Customer Details</CardDescription>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold">
-                  {formatCurrency(parseFloat(selectedCustomer.balance))}
-                </div>
-                <div
-                  className={`text-sm ${parseFloat(selectedCustomer.balance) >= 0 ? "text-green-500" : "text-red-500"}`}
-                >
-                  {parseFloat(selectedCustomer.balance) >= 0
-                    ? "You will receive"
-                    : "You owe"}
-                  {formatCurrency(
-                    Math.abs(parseFloat(selectedCustomer.balance))
-                  )}
-                </div>
-              </div>
-            </div>
+            <CardTitle className="flex items-center space-x-2">
+              <Clock className="size-5" />
+              <span>Transaction History</span>
+            </CardTitle>
+            <CardDescription>
+              Complete history of all transactions for this customer
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <div className="space-y-1">
-                <div className="text-muted-foreground text-sm font-medium">
-                  Phone
-                </div>
-                <div>{selectedCustomer.phone || "N/A"}</div>
+            {selectedCustomer.transactions.length === 0 ? (
+              <div className="py-8 text-center text-muted-foreground">
+                No transactions found for this customer
               </div>
-              <div className="space-y-1">
-                <div className="text-muted-foreground text-sm font-medium">
-                  Email
-                </div>
-                <div>{selectedCustomer.email || "N/A"}</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-muted-foreground text-sm font-medium">
-                  Total Credit
-                </div>
-                <div>
-                  {formatCurrency(parseFloat(selectedCustomer.totalCredit))}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-muted-foreground text-sm font-medium">
-                  Total Paid
-                </div>
-                <div>
-                  {formatCurrency(parseFloat(selectedCustomer.totalPaid))}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-muted-foreground text-sm font-medium">
-                  Status
-                </div>
-                <div className="flex items-center">
-                  <span
-                    className={`mr-2 size-2 rounded-full ${selectedCustomer.isActive ? "bg-green-500" : "bg-gray-500"}`}
-                  ></span>
-                  {selectedCustomer.isActive ? "Active" : "Inactive"}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-muted-foreground text-sm font-medium">
-                  Last Updated
-                </div>
-                <div>
-                  {format(
-                    new Date(selectedCustomer.updatedAt),
-                    "MMM d, yyyy h:mm a"
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {selectedCustomer.notes && (
-              <div className="mt-6 space-y-1">
-                <div className="text-muted-foreground text-sm font-medium">
-                  Notes
-                </div>
-                <div className="bg-muted/50 rounded-md p-4">
-                  {selectedCustomer.notes}
-                </div>
-              </div>
-            )}
-
-            <div className="mt-8">
-              <h3 className="mb-4 text-lg font-medium">Transaction History</h3>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Description</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {selectedCustomer.transactions?.length > 0 ? (
-                      selectedCustomer.transactions.map(transaction => (
-                        <TableRow key={transaction.id}>
-                          <TableCell>
-                            {format(
-                              new Date(transaction.transactionDate),
-                              "MMM d, yyyy h:mm a"
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <span
-                              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                transaction.type === "CREDIT"
-                                  ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                                  : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                              }`}
-                            >
-                              {transaction.type}
-                            </span>
-                          </TableCell>
-                          <TableCell
-                            className={
-                              transaction.type === "CREDIT"
-                                ? "text-red-600 dark:text-red-400"
-                                : "text-green-600 dark:text-green-400"
-                            }
-                          >
-                            {transaction.type === "CREDIT" ? "-" : "+"}
-                            {formatCurrency(parseFloat(transaction.amount))}
-                          </TableCell>
-                          <TableCell>
-                            {transaction.description || "N/A"}
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell
-                          colSpan={4}
-                          className="text-muted-foreground py-8 text-center"
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Description</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {selectedCustomer.transactions.map((transaction) => (
+                    <TableRow key={transaction.id}>
+                      <TableCell>
+                        {format(new Date(transaction.transaction_date), 'MMM dd, yyyy HH:mm')}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={transaction.type === 'CREDIT' ? 'destructive' : 'default'}
+                          className={
+                            transaction.type === 'CREDIT'
+                              ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                              : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          }
                         >
-                          No transactions found for this customer.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
+                          {transaction.type === 'CREDIT' ? 'Credit Given' : 'Payment Received'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={
+                            transaction.type === 'CREDIT'
+                              ? 'font-semibold text-red-600'
+                              : 'font-semibold text-green-600'
+                          }
+                        >
+                          {transaction.type === 'CREDIT' ? '-' : '+'}
+                          {formatCurrency(transaction.amount)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {transaction.description || 'No description'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-          <div>
-            <CardTitle>Customer Database</CardTitle>
-            <CardDescription>
-              Manage your customers and view their transaction history
-            </CardDescription>
+    <div className="space-y-6">
+      {/* Overview Cards */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Outstanding</CardTitle>
+            <IndianRupee className="size-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">{formatCurrency(totalBalance)}</div>
+            <p className="text-xs text-muted-foreground">
+              Amount to be collected from all customers
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Credit Given</CardTitle>
+            <TrendingUp className="size-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(totalCredit)}</div>
+            <p className="text-xs text-muted-foreground">Total amount lent to customers</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Collected</CardTitle>
+            <TrendingDown className="size-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{formatCurrency(totalPaid)}</div>
+            <p className="text-xs text-muted-foreground">Total payments received</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Customer List */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Customer Database</CardTitle>
+              <CardDescription>
+                Manage your customers and view their transaction history
+              </CardDescription>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search customers..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-64 pl-10"
+                />
+              </div>
+            </div>
           </div>
-          <div className="relative w-full md:w-64">
-            <Search className="text-muted-foreground absolute left-2.5 top-2.5 size-4" />
-            <Input
-              type="search"
-              placeholder="Search customers..."
-              className="w-full pl-8"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <div className="flex h-64 items-center justify-center">
-            <div className="border-primary size-8 animate-spin rounded-full border-b-2"></div>
-          </div>
-        ) : (
-          <div className="rounded-md border">
+        </CardHeader>
+        <CardContent>
+          {filteredCustomers.length === 0 ? (
+            <div className="py-8 text-center text-muted-foreground">
+              {searchTerm
+                ? 'No customers found matching your search'
+                : 'No customers found. Add your first customer in the Add Entry tab.'}
+            </div>
+          ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Phone</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Contact</TableHead>
+                  <TableHead>Credit Given</TableHead>
+                  <TableHead>Paid</TableHead>
                   <TableHead>Balance</TableHead>
-                  <TableHead>Last Transaction</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="w-[100px]">Actions</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredCustomers.length > 0 ? (
-                  filteredCustomers.map(customer => (
-                    <TableRow key={customer.id}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
-                          <User className="text-muted-foreground size-4" />
-                          {customer.name}
+                {filteredCustomers.map((customer) => (
+                  <TableRow key={customer.id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{customer.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          Since {format(new Date(customer.created_at), 'MMM yyyy')}
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Phone className="text-muted-foreground size-4" />
-                          {customer.phone || "N/A"}
-                        </div>
-                      </TableCell>
-                      <TableCell
-                        className={
-                          parseFloat(customer.balance) >= 0
-                            ? "text-green-600 dark:text-green-400"
-                            : "text-red-600 dark:text-red-400"
-                        }
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        {customer.phone && (
+                          <div className="flex items-center space-x-1 text-sm">
+                            <Phone className="size-3" />
+                            <span>{customer.phone}</span>
+                          </div>
+                        )}
+                        {customer.email && (
+                          <div className="flex items-center space-x-1 text-sm text-muted-foreground">
+                            <Mail className="size-3" />
+                            <span>{customer.email}</span>
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-medium text-red-600">
+                        {formatCurrency(customer.total_credit || 0)}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-medium text-green-600">
+                        {formatCurrency(customer.total_paid || 0)}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className={`font-bold ${(customer.balance || 0) > 0 ? 'text-red-600' : 'text-green-600'}`}
                       >
-                        <div className="flex items-center gap-2">
-                          <DollarSign className="size-4" />
-                          {formatCurrency(
-                            Math.abs(parseFloat(customer.balance))
-                          )}
-                          {parseFloat(customer.balance) < 0 && " (Overpaid)"}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="text-muted-foreground size-4" />
-                          {format(new Date(customer.updatedAt), "MMM d, yyyy")}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center">
-                          <span
-                            className={`mr-2 size-2 rounded-full ${customer.isActive ? "bg-green-500" : "bg-gray-500"}`}
-                          ></span>
-                          {customer.isActive ? "Active" : "Inactive"}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleCustomerSelect(customer)}
-                        >
-                          View
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      className="text-muted-foreground py-8 text-center"
-                    >
-                      {searchTerm
-                        ? "No customers match your search."
-                        : "No customers found. Add your first customer to get started."}
+                        {formatCurrency(customer.balance || 0)}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={customer.is_active ? 'default' : 'secondary'}>
+                        {customer.is_active ? 'Active' : 'Inactive'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => loadCustomerDetails(customer.id)}
+                        disabled={customerDetailsLoading}
+                      >
+                        View Details
+                      </Button>
                     </TableCell>
                   </TableRow>
-                )}
+                ))}
               </TableBody>
             </Table>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  )
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
 }

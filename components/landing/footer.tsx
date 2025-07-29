@@ -2,8 +2,8 @@
 This server component provides the footer for the app.
 */
 
-import { Github, Twitter } from "lucide-react"
-import Link from "next/link"
+import { Github, Twitter } from 'lucide-react';
+import Link from 'next/link';
 
 export async function Footer() {
   return (
@@ -15,19 +15,16 @@ export async function Footer() {
             <div className="flex flex-col gap-2">
               <Link
                 href="/about"
-                className="text-muted-foreground hover:text-foreground transition"
+                className="text-muted-foreground transition hover:text-foreground"
               >
                 About
               </Link>
-              <Link
-                href="/blog"
-                className="text-muted-foreground hover:text-foreground transition"
-              >
+              <Link href="/blog" className="text-muted-foreground transition hover:text-foreground">
                 Blog
               </Link>
               <Link
                 href="/careers"
-                className="text-muted-foreground hover:text-foreground transition"
+                className="text-muted-foreground transition hover:text-foreground"
               >
                 Careers
               </Link>
@@ -39,20 +36,17 @@ export async function Footer() {
             <div className="flex flex-col gap-2">
               <Link
                 href="/features"
-                className="text-muted-foreground hover:text-foreground transition"
+                className="text-muted-foreground transition hover:text-foreground"
               >
                 Features
               </Link>
               <Link
                 href="/pricing"
-                className="text-muted-foreground hover:text-foreground transition"
+                className="text-muted-foreground transition hover:text-foreground"
               >
                 Pricing
               </Link>
-              <Link
-                href="/docs"
-                className="text-muted-foreground hover:text-foreground transition"
-              >
+              <Link href="/docs" className="text-muted-foreground transition hover:text-foreground">
                 Documentation
               </Link>
             </div>
@@ -63,19 +57,19 @@ export async function Footer() {
             <div className="flex flex-col gap-2">
               <Link
                 href="/support"
-                className="text-muted-foreground hover:text-foreground transition"
+                className="text-muted-foreground transition hover:text-foreground"
               >
                 Support
               </Link>
               <Link
                 href="/terms"
-                className="text-muted-foreground hover:text-foreground transition"
+                className="text-muted-foreground transition hover:text-foreground"
               >
                 Terms
               </Link>
               <Link
                 href="/privacy"
-                className="text-muted-foreground hover:text-foreground transition"
+                className="text-muted-foreground transition hover:text-foreground"
               >
                 Privacy
               </Link>
@@ -85,30 +79,20 @@ export async function Footer() {
           <div className="space-y-4">
             <h3 className="text-lg font-bold">Social</h3>
             <div className="flex gap-4">
-              <Link
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Github className="text-muted-foreground hover:text-foreground size-6 transition" />
+              <Link href="https://github.com" target="_blank" rel="noopener noreferrer">
+                <Github className="size-6 text-muted-foreground transition hover:text-foreground" />
               </Link>
-              <Link
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Twitter className="text-muted-foreground hover:text-foreground size-6 transition" />
+              <Link href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+                <Twitter className="size-6 text-muted-foreground transition hover:text-foreground" />
               </Link>
             </div>
           </div>
         </div>
 
-        <div className="text-muted-foreground mt-12 pt-8 text-center">
-          <p>
-            &copy; {new Date().getFullYear()} Your Company. All rights reserved.
-          </p>
+        <div className="mt-12 pt-8 text-center text-muted-foreground">
+          <p>&copy; {new Date().getFullYear()} Your Company. All rights reserved.</p>
         </div>
       </div>
     </footer>
-  )
+  );
 }

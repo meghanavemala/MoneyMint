@@ -8,11 +8,13 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
-const nextConfig = { 
-  images: { 
-    remotePatterns: [{ 
-      hostname: "localhost" 
-    }] 
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        hostname: 'localhost',
+      },
+    ],
   },
   // Add this to ensure path aliases work
   webpack: (config) => {
@@ -22,6 +24,6 @@ const nextConfig = {
     };
     return config;
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;

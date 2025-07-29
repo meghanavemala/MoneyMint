@@ -1,350 +1,435 @@
-"use server"
+/*
+Finance actions for managing customers, transactions, and daily collections.
+Handles all database operations for the finance tracking app.
+*/
 
-import { db } from "@/db"
-import { customers, transactions } from "@/db/schema"
-import { and, asc, desc, eq, gte, lte, sql } from "drizzle-orm"
-import { revalidatePath } from "next/cache"
-import { auth } from "@clerk/nextjs/server"
-import type { 
-  Customer, 
-  NewCustomer, 
-  NewTransaction, 
-  Transaction 
-} from "@/db/schema/finance-schema"
-import type { SQL } from "drizzle-orm"
-import type { PgTableWithColumns } from "drizzle-orm/pg-core"
+'use server';
 
-export type CustomerWithBalance = Customer & { balance: string }
+import { createClient } from '@/lib/supabase/server';
+import { revalidatePath } from 'next/cache';
+import { auth } from '@clerk/nextjs/server';
+import type { Customer, Transaction, NewCustomer, NewTransaction } from '@/lib/supabase/database.types';
+import type { ActionState } from '@/types';
+
+export type CustomerWithBalance = Customer & { 
+  balance: number;
+  total_credit: number;
+  total_paid: number;
+};
 
 export type CustomerWithTransactions = Customer & {
   transactions: Array<{
-    id: string
-    amount: string
-    type: 'CREDIT' | 'PAYMENT'
-    description: string | null
-    transactionDate: Date
-    createdAt: Date
-  }>
-}
-
-type WhereFn<T extends PgTableWithColumns<any>> = (
-  table: T,
-  operators: { 
-    eq: (column: any, value: any) => SQL<unknown>;
-    and: (...conditions: SQL<unknown>[]) => SQL<unknown>;
-  }
-) => SQL<unknown>;
-
-export type ApiResponse<T> = {
-  isSuccess: boolean;
-  data?: T;
-  error?: string;
+    id: string;
+    amount: number;
+    type: 'CREDIT' | 'PAYMENT';
+    description: string | null;
+    transaction_date: string;
+    created_at: string;
+  }>;
 };
 
-export async function getCustomersAction() {
-  const { userId } = await auth()
-  if (!userId) return { isSuccess: false, error: "Unauthorized" }
+export async function getCustomersAction(): Promise<ActionState<CustomerWithBalance[]>> {
+  const { userId } = await auth();
+  if (!userId) return { isSuccess: false, message: 'Unauthorized' };
 
   try {
-    const result = await db
-      .select()
-      .from(customers)
-      .where(eq(customers.profileId, userId))
-      .orderBy(desc(customers.updatedAt))
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from('customers')
+      .select('*')
+      .eq('profile_id', userId)
+      .order('name', { ascending: true });
 
-    return { isSuccess: true, data: result }
-  } catch (error) {
-    console.error("Error fetching customers:", error)
-    return { isSuccess: false, error: "Failed to fetch customers" }
-  }
-}
-
-
-
-export async function getCustomerByIdAction(id: string) {
-  const { userId } = await auth()
-  if (!userId) return { isSuccess: false, error: "Unauthorized" }
-
-  try {
-    const customer = await db.query.customers.findFirst({
-      where: (
-        table: typeof customers,
-        { eq, and }: { eq: typeof eq; and: typeof and }
-      ) => {
-        return and(
-          eq(table.id, id),
-          eq(table.profileId, userId)
-        );
-      },
-      with: {
-        transactions: {
-          orderBy: (
-            transactions: typeof transactions,
-            { desc }: { desc: (field: any) => any }
-          ) => [
-            desc(transactions.transactionDate)
-          ],
-        },
-      },
-    })
-
-    if (!customer) {
-      return { isSuccess: false, error: "Customer not found" }
-    }
-
-    // Calculate balance
-    const balance = (
-      parseFloat(customer.totalCredit) - parseFloat(customer.totalPaid)
-    ).toFixed(2)
+    if (error) throw error;
 
     return {
       isSuccess: true,
+      message: 'Customers retrieved successfully',
+      data: data.map((customer) => ({
+        ...customer,
+        balance: customer.balance || 0,
+        total_credit: customer.total_credit || 0,
+        total_paid: customer.total_paid || 0,
+      })),
+    };
+  } catch (error) {
+    console.error('Error fetching customers:', error);
+    return {
+      isSuccess: false,
+      message: error instanceof Error ? error.message : 'Failed to fetch customers',
+    };
+  }
+}
+
+export async function getCustomerByIdAction(
+  id: string
+): Promise<ActionState<CustomerWithTransactions>> {
+  const { userId } = await auth();
+  if (!userId) return { isSuccess: false, message: 'Unauthorized' };
+
+  try {
+    const supabase = await createClient();
+
+    // Get customer
+    const { data: customer, error: customerError } = await supabase
+      .from('customers')
+      .select('*')
+      .eq('id', id)
+      .eq('profile_id', userId)
+      .single();
+
+    if (customerError) {
+      if (customerError.code === 'PGRST116') {
+        return { isSuccess: false, message: 'Customer not found' };
+      }
+      throw customerError;
+    }
+
+    // Get customer's transactions
+    const { data: transactions, error: transactionsError } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('customer_id', id)
+      .order('transaction_date', { ascending: false });
+
+    if (transactionsError) throw transactionsError;
+
+    return {
+      isSuccess: true,
+      message: 'Customer details retrieved successfully',
       data: {
         ...customer,
-        balance,
-        transactions: customer.transactions.map(transaction => ({
-          ...transaction,
-          amount: transaction.amount.toString(),
+        balance: customer.balance || 0,
+        transactions: transactions.map((tx) => ({
+          id: tx.id,
+          amount: tx.amount,
+          type: tx.type as 'CREDIT' | 'PAYMENT',
+          description: tx.description,
+          transaction_date: tx.transaction_date,
+          created_at: tx.created_at,
         })),
-      }
-    }
+      },
+    };
   } catch (error) {
-    console.error("Error getting customer:", error)
-    return { 
-      isSuccess: false, 
-      error: error instanceof Error ? error.message : "Failed to get customer" 
-    }
+    console.error('Error fetching customer:', error);
+    return {
+      isSuccess: false,
+      message: error instanceof Error ? error.message : 'Failed to fetch customer',
+    };
   }
 }
 
 export async function createCustomerAction(
-  data: Omit<
-    NewCustomer, 
-    'id' | 'createdAt' | 'updatedAt' | 'profileId' | 'totalCredit' | 'totalPaid' | 'balance'
-  >
-) {
-  const { userId } = await auth()
-  if (!userId) return { isSuccess: false, error: "Unauthorized" }
-
+  data: Pick<NewCustomer, 'name' | 'email' | 'phone' | 'address' | 'notes'>
+): Promise<ActionState<Customer>> {
   try {
-    const [newCustomer] = await db
-      .insert(customers)
-      .values({
-        ...data,
-        profileId: userId,
-        totalCredit: "0",
-        totalPaid: "0",
-        balance: "0"
-      })
-      .returning()
+    console.log('🔐 Getting user ID...');
+    const { userId } = await auth();
 
-    revalidatePath("/dashboard")
-    return { isSuccess: true, data: newCustomer }
-  } catch (error) {
-    console.error("Error creating customer:", error)
-    return { isSuccess: false, error: "Failed to create customer" }
-  }
-}
+    if (!userId) {
+      console.error('❌ No user ID found');
+      return {
+        isSuccess: false,
+        message: 'Unauthorized: Please sign in',
+      };
+    }
 
-export async function updateCustomerAction(id: string, data: Partial<Omit<Customer, 'id' | 'createdAt' | 'updatedAt' | 'profileId' | 'totalCredit' | 'totalPaid' | 'balance'>>) {
-  const { userId } = await auth()
-  if (!userId) return { isSuccess: false, error: "Unauthorized" }
+    console.log('✅ User ID:', userId);
 
-  try {
-    const [updatedCustomer] = await db
-      .update(customers)
-      .set({
-        ...data,
-        updatedAt: new Date()
-      })
-      .where(
-        and(
-          eq(customers.id, id),
-          eq(customers.profileId, userId)
-        )
-      )
-      .returning()
+    if (!data.name?.trim()) {
+      console.error('❌ No customer name provided');
+      return {
+        isSuccess: false,
+        message: 'Customer name is required',
+      };
+    }
 
-    revalidatePath("/dashboard")
-    return { isSuccess: true, data: updatedCustomer }
-  } catch (error) {
-    console.error("Error updating customer:", error)
-    return { isSuccess: false, error: "Failed to update customer" }
-  }
-}
+    console.log('🔗 Creating Supabase client...');
+    const supabase = await createClient();
 
-export async function deleteCustomerAction(id: string) {
-  const { userId } = await auth()
-  if (!userId) return { isSuccess: false, error: "Unauthorized" }
+    const customerData = {
+      ...data,
+      name: data.name.trim(),
+      email: data.email?.trim() || null,
+      phone: data.phone?.trim() || null,
+      address: data.address?.trim() || null,
+      notes: data.notes?.trim() || null,
+      profile_id: userId,
+      total_credit: 0,
+      total_paid: 0,
+      is_active: true,
+    };
 
-  try {
-    await db
-      .delete(customers)
-      .where(
-        and(
-          eq(customers.id, id),
-          eq(customers.profileId, userId)
-        )
-      )
+    console.log('📝 Customer data to insert:', customerData);
 
-    revalidatePath("/dashboard")
-    return { isSuccess: true }
-  } catch (error) {
-    console.error("Error deleting customer:", error)
-    return { isSuccess: false, error: "Failed to delete customer" }
-  }
-}
-
-export async function getCustomerTransactionsAction(customerId: string) {
-  const { userId } = await auth()
-  if (!userId) return { isSuccess: false, error: "Unauthorized" }
-
-  try {
-    const result = await db
+    console.log('💾 Inserting customer into database...');
+    const { data: newCustomer, error } = await supabase
+      .from('customers')
+      .insert(customerData)
       .select()
-      .from(transactions)
-      .where(
-        and(
-          eq(transactions.customerId, customerId),
-          eq(transactions.profileId, userId)
-        )
-      )
-      .orderBy(desc(transactions.transactionDate))
+      .single();
 
-    return { isSuccess: true, data: result }
+    if (error) {
+      console.error('❌ Supabase error:', error);
+      console.error('   Code:', error.code);
+      console.error('   Message:', error.message);
+      console.error('   Details:', error.details);
+      console.error('   Hint:', error.hint);
+
+      if (error.code === '23505') {
+        return {
+          isSuccess: false,
+          message: 'A customer with this email or phone already exists',
+        };
+      }
+
+      throw new Error(error.message || 'Failed to create customer');
+    }
+
+    console.log('✅ Customer inserted successfully:', newCustomer);
+
+    console.log('🔄 Revalidating path...');
+    revalidatePath('/dashboard');
+
+    return {
+      isSuccess: true,
+      message: 'Customer created successfully',
+      data: newCustomer,
+    };
   } catch (error) {
-    console.error("Error fetching transactions:", error)
-    return { isSuccess: false, error: "Failed to fetch transactions" }
+    console.error('💥 Error in createCustomerAction:', error);
+    return {
+      isSuccess: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred while creating the customer',
+    };
+  }
+}
+
+export async function updateCustomerAction(
+  id: string,
+  data: Partial<Pick<Customer, 'name' | 'email' | 'phone' | 'address' | 'notes' | 'is_active'>>
+): Promise<ActionState<Customer>> {
+  const { userId } = await auth();
+  if (!userId) return { isSuccess: false, message: 'Unauthorized' };
+
+  try {
+    const supabase = await createClient();
+    const { data: updatedCustomer, error } = await supabase
+      .from('customers')
+      .update({
+        ...data,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .eq('profile_id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    revalidatePath('/dashboard');
+    return { 
+      isSuccess: true, 
+      message: 'Customer updated successfully',
+      data: updatedCustomer 
+    };
+  } catch (error) {
+    console.error('Error updating customer:', error);
+    return {
+      isSuccess: false,
+      message: error instanceof Error ? error.message : 'Failed to update customer',
+    };
+  }
+}
+
+export async function deleteCustomerAction(id: string): Promise<ActionState<undefined>> {
+  const { userId } = await auth();
+  if (!userId) return { isSuccess: false, message: 'Unauthorized' };
+
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from('customers')
+      .delete()
+      .eq('id', id)
+      .eq('profile_id', userId);
+
+    if (error) throw error;
+
+    revalidatePath('/dashboard');
+    return { 
+      isSuccess: true, 
+      message: 'Customer deleted successfully',
+      data: undefined 
+    };
+  } catch (error) {
+    console.error('Error deleting customer:', error);
+    return {
+      isSuccess: false,
+      message: error instanceof Error ? error.message : 'Failed to delete customer',
+    };
+  }
+}
+
+export async function getCustomerTransactionsAction(
+  customerId: string
+): Promise<ActionState<Array<Transaction>>> {
+  const { userId } = await auth();
+  if (!userId) return { isSuccess: false, message: 'Unauthorized' };
+
+  try {
+    const supabase = await createClient();
+
+    // First verify the customer belongs to the user
+    const { data: customer, error: customerError } = await supabase
+      .from('customers')
+      .select('id')
+      .eq('id', customerId)
+      .eq('profile_id', userId)
+      .single();
+
+    if (customerError || !customer) {
+      return { isSuccess: false, message: 'Customer not found or access denied' };
+    }
+
+    // Get all transactions for the customer
+    const { data: transactions, error: transactionsError } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('customer_id', customerId)
+      .order('transaction_date', { ascending: false });
+
+    if (transactionsError) throw transactionsError;
+
+    return {
+      isSuccess: true,
+      message: 'Transactions retrieved successfully',
+      data: transactions,
+    };
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    return {
+      isSuccess: false,
+      message: error instanceof Error ? error.message : 'Failed to fetch transactions',
+    };
   }
 }
 
 export async function createTransactionAction(
-  data: Omit<
-    NewTransaction, 
-    'id' | 'transactionDate' | 'createdAt' | 'profileId'
-  >
-) {
-  const { userId } = await auth()
-  if (!userId) return { isSuccess: false, error: "Unauthorized" }
+  data: {
+    customer_id: string;
+    amount: number;
+    type: 'CREDIT' | 'PAYMENT';
+    description?: string;
+    transaction_date?: string;
+  }
+): Promise<ActionState<Transaction>> {
+  const { userId } = await auth();
+  if (!userId) return { isSuccess: false, message: 'Unauthorized' };
 
   try {
-    // Start a transaction
-    const result = await db.transaction(async (tx: typeof db) => {
-      // Get the customer with a lock
-      const [customer] = await tx
-        .select()
-        .from(customers)
-        .where(
-          and(
-            eq(customers.id, data.customerId),
-            eq(customers.profileId, userId)
-          )
-        )
-        .for("update")
-        .limit(1)
+    const supabase = await createClient();
 
-      if (!customer) {
-        throw new Error("Customer not found")
-      }
+    // Use Supabase's rpc for atomic operations
+    const { data: result, error } = await supabase.rpc('create_transaction', {
+      p_customer_id: data.customer_id,
+      p_amount: data.amount,
+      p_type: data.type,
+      p_description: data.description || null,
+      p_profile_id: userId,
+    });
 
-      // Calculate new totals
-      const amount = parseFloat(data.amount)
-      let newTotalCredit = parseFloat(customer.totalCredit)
-      let newTotalPaid = parseFloat(customer.totalPaid)
+    if (error) throw error;
 
-      if (data.type === "CREDIT") {
-        newTotalCredit += amount
-      } else {
-        newTotalPaid += amount
-      }
-
-      const newBalance = newTotalCredit - newTotalPaid
-
-      // Update customer's balance
-      await tx
-        .update(customers)
-        .set({
-          totalCredit: newTotalCredit.toString(),
-          totalPaid: newTotalPaid.toString(),
-          balance: newBalance.toString(),
-          updatedAt: new Date()
-        })
-        .where(eq(customers.id, data.customerId))
-
-      // Create the transaction
-      const [newTransaction] = await tx
-        .insert(transactions)
-        .values({
-          ...data,
-          transactionDate: new Date(),
-          profileId: userId
-        })
-        .returning()
-
-      return newTransaction
-    })
-
-    revalidatePath("/dashboard")
-    return { isSuccess: true, data: result }
+    revalidatePath('/dashboard');
+    return { 
+      isSuccess: true, 
+      message: 'Transaction created successfully',
+      data: result 
+    };
   } catch (error) {
-    console.error("Error creating transaction:", error)
-    return { isSuccess: false, error: error instanceof Error ? error.message : "Failed to create transaction" }
+    console.error('Error creating transaction:', error);
+    return {
+      isSuccess: false,
+      message: error instanceof Error ? error.message : 'Failed to create transaction',
+    };
   }
 }
 
-export async function getDailyCollectionsAction(date: Date = new Date()) {
-  const { userId } = await auth()
-  if (!userId) return { isSuccess: false, error: "Unauthorized" }
+export async function getDailyCollectionsAction(date: Date = new Date()): Promise<
+  ActionState<{
+    date: Date;
+    totalCollection: number;
+    transactions: Array<{
+      id: string;
+      customer_id: string;
+      customer_name: string;
+      amount: number;
+      type: 'CREDIT' | 'PAYMENT';
+      description: string | null;
+      transaction_date: string;
+    }>;
+  }>
+> {
+  const { userId } = await auth();
+  if (!userId) return { isSuccess: false, message: 'Unauthorized' };
 
   try {
-    // Get the start and end of the day
-    const startOfDay = new Date(date)
-    startOfDay.setHours(0, 0, 0, 0)
-    
-    const endOfDay = new Date(date)
-    endOfDay.setHours(23, 59, 59, 999)
+    const supabase = await createClient();
 
-    // Get all transactions for the day
-    const dailyTransactions = await db
-      .select({
-        id: transactions.id,
-        customerId: transactions.customerId,
-        customerName: customers.name,
-        amount: transactions.amount,
-        type: transactions.type,
-        description: transactions.description,
-        transactionDate: transactions.transactionDate
-      })
-      .from(transactions)
-      .innerJoin(
-        customers,
-        eq(transactions.customerId, customers.id)
-      )
-      .where(
-        and(
-          eq(transactions.profileId, userId),
-          eq(transactions.type, "PAYMENT"),
-          gte(transactions.transactionDate, startOfDay),
-          lte(transactions.transactionDate, endOfDay)
-        )
-      )
-      .orderBy(desc(transactions.transactionDate))
+    // Format dates for Supabase query
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
 
-    // Calculate total collection for the day
-    const totalCollection = dailyTransactions.reduce((sum, txn: { amount: string }) => {
-      return sum + parseFloat(txn.amount)
-    }, 0)
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Get all transactions for the day with customer info
+    const { data, error } = await supabase
+      .from('transactions')
+      .select(`
+        *,
+        customers (name)
+      `)
+      .gte('transaction_date', startOfDay.toISOString())
+      .lte('transaction_date', endOfDay.toISOString())
+      .order('transaction_date', { ascending: false });
+
+    if (error) throw error;
+
+    // Transform the data to match the expected format
+    const transactions = (data || []).map((tx: any) => ({
+      id: tx.id,
+      customer_id: tx.customer_id,
+      customer_name: tx.customers?.name || 'Unknown',
+      amount: tx.amount,
+      type: tx.type as 'CREDIT' | 'PAYMENT',
+      description: tx.description,
+      transaction_date: tx.transaction_date,
+    }));
+
+    // Calculate total collection for the day (only payments)
+    const totalCollection = transactions
+      .filter(tx => tx.type === 'PAYMENT')
+      .reduce((sum, tx) => sum + tx.amount, 0);
 
     return {
       isSuccess: true,
+      message: 'Daily collections retrieved successfully',
       data: {
         date,
         totalCollection,
-        transactions: dailyTransactions
-      }
-    }
+        transactions,
+      },
+    };
   } catch (error) {
-    console.error("Error fetching daily collections:", error)
-    return { isSuccess: false, error: "Failed to fetch daily collections" }
+    console.error('Error fetching daily collections:', error);
+    return {
+      isSuccess: false,
+      message: error instanceof Error ? error.message : 'Failed to fetch daily collections',
+    };
   }
 }
