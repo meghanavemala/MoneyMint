@@ -1,101 +1,166 @@
-# Building Apps with the o1 Pro Template System
+Here’s a complete, professional-looking `README.md` file for your **MoneyMint** finance tracking app, based on the functionality and tools you've described. It includes all the key sections, feature highlights, tech stack, and instructions, and notes support for both **desktop and mobile** platforms.
 
-This is the repo for a free workshop on how to use [OpenAI's o1-pro](https://chatgpt.com/) to build full-stack web apps with a [starter template](https://github.com/mckaywrigley/mckays-app-template).
+---
 
-It is part 1 of a 2 part series. This is the beginner workshop. The advanced workshop will be released on February 24th.
+```markdown
+# 💸 MoneyMint – Finance Tracking App for Moneylenders
 
-## Workshop Video
+MoneyMint is a modern and user-friendly finance tracking web application designed specifically for moneylenders to track customer loans, payments, balances, and daily collections. Inspired by apps like Khata Book, it provides a powerful yet simple way to manage financial transactions, all stored securely using **Supabase** and accessible via **desktop** and **mobile** devices.
 
-You can find the video for this workshop on [X](https://x.com/mckaywrigley/status/1891544731496206365) and [YouTube](https://www.youtube.com/watch?v=Y4n_p9w8pGY).
+---
 
-This workshop is also available in course form on [Takeoff](https://www.jointakeoff.com/) - we will continue to add to it and keep it updated with the latest model releases over time.
+## 🚀 Features
 
-Use code `O1PRO` for 25% off at checkout.
+### 📊 Dashboard
+- View **all customers** and their:
+  - Total money borrowed
+  - Total paid to date
+  - Remaining balance
+- Click a customer to view full **transaction history**:
+  - All payment dates and times
+  - Initial loan date
+  - Personal details (Name, Address, Phone)
+- **Download transaction history as PDF** for the full period or selected month
 
-I get asked all the time for an example of content on Takeoff, so hopefully this workshop gives you a feel for our content and my teaching style.
+### ➕ Add Entry
+- Add **new customer** details:
+  - Name, Phone, Address, Loan Amount, etc.
+- Search for existing customers and:
+  - Add daily payments (amount only)
+  - Auto-update the balance
+  - Set/change payment date
+- Entries are **stored and updated in real-time** in Supabase
 
-## About Me
+### 📅 Daily Collection
+- View all transactions for a **selected day** via calendar
+- Visually separate:
+  - **Credit (Green)** and **Debit (Red)**
+- Helps monitor day-to-day cash flow
 
-My name is [Mckay](https://www.mckaywrigley.com/).
+### 🎨 UI and Extras
+- Fully **responsive** for both desktop and mobile
+- **Dark / Light theme toggle**
+- Smooth **sign-in via Clerk**
+- **Landing page** with clean branding
 
-I'm currently building [Takeoff](https://www.jointakeoff.com/) - the best place on the internet to learn how to build with AI.
+---
 
-Follow me on [X](https://x.com/mckaywrigley) and subscribe to my [YouTube](https://www.youtube.com/channel/UCXZFVVCFahewxr3est7aT7Q) for more free AI coding tutorials & guides.
+## 🛠 Tech Stack
 
-## Tech Stack
+| Tool | Purpose |
+|------|---------|
+| **React** | Frontend Framework |
+| **Supabase** | Backend-as-a-Service (Database + Auth + Storage) |
+| **Clerk** | User authentication |
+| **TailwindCSS** | Styling |
+| **React Router** | Page Navigation |
+| **React-PDF / jsPDF** | PDF download functionality |
+| **Day.js** or **Date-fns** | Date & time formatting |
+| **Vercel** | Deployment Platform |
 
-- AI Model: [o1-pro](https://chatgpt.com/)
-- IDE: [Cursor](https://www.cursor.com/)
-- AI Tools: [RepoPrompt](https://repoprompt.com/), [V0](https://v0.dev/), [Perplexity](https://www.perplexity.com/)
-- Frontend: [Next.js](https://nextjs.org/docs), [Tailwind](https://tailwindcss.com/docs/guides/nextjs), [Shadcn](https://ui.shadcn.com/docs/installation), [Framer Motion](https://www.framer.com/motion/introduction/)
-- Backend: [PostgreSQL](https://www.postgresql.org/about/), [Supabase](https://supabase.com/), [Drizzle](https://orm.drizzle.team/docs/get-started-postgresql), [Server Actions](https://nextjs.org/docs/app/building-your-application/data-fetching/server-actions-and-mutations)
-- Auth: [Clerk](https://clerk.com/)
+---
 
-**Note**: While I _highly_ recommend using o1-pro for this workflow, you can also use o3-mini, Claude 3.5 Sonnet, Gemini 2.0 Pro, and DeepSeek r1 for cheaper alternatives. However, you _will_ run into issues with those other models in this particular workflow, so I recommend using o1-pro for this workflow if possible.
-
-## Prerequisites
-
-You will need accounts for the following services.
-
-They all have free plans that you can use to get started, with the exception of ChatGPT Pro (if you are using o1-pro).
-
-- Create a [Cursor](https://www.cursor.com/) account
-- Create a [GitHub](https://github.com/) account
-- Create a [Supabase](https://supabase.com/) account
-- Create a [Clerk](https://clerk.com/) account
-- Create a [Vercel](https://vercel.com/) account
-
-You will likely not need paid plans unless you are building a business.
-
-## Guide
-
-### Clone the repo
-
-1. Clone this repo:
-
-```bash
-git clone https://github.com/mckaywrigley/o1-pro-template-system o1-pro-project
-```
-
-2. Save the original remote as "upstream" before removing it:
-
-```bash
-git remote rename origin upstream
-```
-
-3. Create a new repository on GitHub
-
-4. Add the new repository as "origin":
-
-```bash
-git remote add origin https://github.com/your-username/your-repo-name.git
-```
-
-5. Push the new repository:
+## 📁 Project Structure
 
 ```
-git branch -M main
-git push -u origin main
+
+money-mint/
+│
+├── src/
+│   ├── components/
+│   ├── pages/
+│   │   ├── Dashboard.jsx
+│   │   ├── AddEntry.jsx
+│   │   ├── DailyCollection.jsx
+│   ├── services/
+│   │   └── supabaseClient.js
+│   ├── utils/
+│   │   └── pdfGenerator.js
+│   └── App.jsx
+├── public/
+├── .env
+└── README.md
+
+````
+
+---
+
+## 📦 Database Schema (Supabase)
+
+- **customers**
+  - `id`, `name`, `phone`, `address`, `loan_amount`, `loan_date`, `created_at`
+
+- **transactions**
+  - `id`, `customer_id`, `amount`, `type` (credit/debit), `date`, `created_at`
+
+- **users**
+  - Managed via **Clerk**, integrated with Supabase via JWT
+
+---
+
+## 📲 How to Run Locally
+
+1. **Clone the Repository**  
+   ```bash
+   git clone https://github.com/your-username/moneymint.git
+   cd moneymint
+````
+
+2. **Install Dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Set Up Environment Variables**
+   Create a `.env` file with:
+
+   ```env
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_ANON_KEY=your_supabase_key
+   CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+   CLERK_SIGN_IN_URL=https://your-app.clerk.accounts.dev/sign-in
+   CLERK_SIGN_UP_URL=https://your-app.clerk.accounts.dev/sign-up
+   ```
+
+4. **Run the App**
+
+   ```bash
+   npm run dev
+   ```
+
+5. **Visit**
+   Open `http://localhost:3000` in your browser
+
+---
+
+## ✅ Compatibility
+
+MoneyMint is:
+
+* ✅ Fully **responsive** – optimized for **desktop** and **mobile**
+* 🌓 Supports both **Dark** and **Light** mode
+* 🔐 Auth-secured via **Clerk**
+
+---
+
+## 🧱 Planned Enhancements
+
+* 🔔 Push notifications for due payments
+* 📈 Analytics dashboard
+* 🗃️ Export CSV reports
+* 🌍 Multilingual support (starting with Kannada/Hindi)
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+
+---
+
+
+> Built with ❤️ for Indian moneylenders and small businesses.
+> From paper *bahi-khatas* to the digital future — *MoneyMint* is here to help you grow!
+
 ```
-
-### Run the app
-
-1. Install dependencies:
-
-```bash
-npm install
-```
-
-2. Run the app:
-
-```bash
-npm run dev
-```
-
-3.  View the app on http://localhost:3000
-
-### Follow the workshop
-
-View the full workshop on [X](https://x.com/mckaywrigley/status/1891544731496206365) and [YouTube](https://www.youtube.com/watch?v=Y4n_p9w8pGY).
-
-Or sign up for [Takeoff](https://www.jointakeoff.com/) to get access to the full workshop in course form.
