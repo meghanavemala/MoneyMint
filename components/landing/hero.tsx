@@ -84,23 +84,9 @@ export const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}
           >
-            <SignedIn>
-              <Link href="/dashboard">
-                <Button className="bg-green-600 text-lg hover:bg-green-700">Go to Dashboard</Button>
-              </Link>
-            </SignedIn>
-            <SignedOut>
-              <Link href="/dashboard">
-                <Button className="mr-2 bg-green-600 text-lg hover:bg-green-700">
-                  Go to Dashboard
-                </Button>
-              </Link>
-              <Link href="/sign-up">
-                <Button variant="outline" className="text-lg">
-                  Create Free Account
-                </Button>
-              </Link>
-            </SignedOut>
+            <Link href="/dashboard">
+              <Button className="bg-green-600 text-lg hover:bg-green-700">Go to Dashboard</Button>
+            </Link>
           </motion.div>
         </motion.div>
       </div>

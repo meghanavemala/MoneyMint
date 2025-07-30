@@ -54,27 +54,6 @@ export default function Header() {
             Money Mint
           </Link>
         </motion.div>
-
-        <div className="hidden items-center space-x-6 md:flex">
-          <Link
-            href="/dashboard"
-            className="text-base font-medium transition-colors hover:text-green-600"
-          >
-            Customer Dashboard
-          </Link>
-          <Link
-            href="/dashboard?tab=add-entry"
-            className="text-base font-medium transition-colors hover:text-green-600"
-          >
-            Add Entry
-          </Link>
-          <Link
-            href="/dashboard?tab=daily-collection"
-            className="text-base font-medium transition-colors hover:text-green-600"
-          >
-            Daily Collection
-          </Link>
-        </div>
         <div className="flex items-center space-x-4">
           <SignedOut>
             <SignInButton>
@@ -110,29 +89,6 @@ export default function Header() {
             <li>
               <Link href="/" className="block hover:underline" onClick={toggleMenu}>
                 Home
-              </Link>
-            </li>
-            <li>
-              <Link href="/dashboard" className="block hover:underline" onClick={toggleMenu}>
-                Customer Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/dashboard?tab=add-entry"
-                className="block hover:underline"
-                onClick={toggleMenu}
-              >
-                Add Entry
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/dashboard?tab=daily-collection"
-                className="block hover:underline"
-                onClick={toggleMenu}
-              >
-                Daily Collection
               </Link>
             </li>
           </ul>
