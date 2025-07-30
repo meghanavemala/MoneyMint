@@ -1,7 +1,3 @@
-Here’s a complete, professional-looking `README.md` file for your **MoneyMint** finance tracking app, based on the functionality and tools you've described. It includes all the key sections, feature highlights, tech stack, and instructions, and notes support for both **desktop and mobile** platforms.
-
----
-
 ```markdown
 # 💸 MoneyMint – Finance Tracking App for Moneylenders
 
