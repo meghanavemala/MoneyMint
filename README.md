@@ -97,7 +97,7 @@ money-mint/
 
 1. **Clone the Repository**  
    ```bash
-   git clone https://github.com/your-username/moneymint.git
+   git clone git@github.com:meghanavemala/MoneyMint.git moneymint
    cd moneymint
 ````
 
