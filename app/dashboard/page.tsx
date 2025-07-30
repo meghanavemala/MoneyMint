@@ -22,7 +22,7 @@ export default async function DashboardPage() {
               value="database"
               className="flex min-w-[140px] items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm md:min-w-[160px] md:text-base lg:min-w-[180px] lg:text-lg"
             >
-              <span>Customer Dashboard</span>
+              <span>Customers</span>
             </TabsTrigger>
             <TabsTrigger
               value="add-entry"

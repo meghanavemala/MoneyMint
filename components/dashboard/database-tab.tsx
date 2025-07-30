@@ -155,10 +155,10 @@ export function DatabaseTab() {
 
   if (viewMode === 'details' && selectedCustomer) {
     return (
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+      <div className="space-y-4 md:space-y-6">
+        {/* Header - Mobile Optimized */}
+        <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+          <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-x-4 sm:space-y-0">
             <Button
               variant="outline"
               size="sm"
@@ -166,69 +166,86 @@ export function DatabaseTab() {
                 setViewMode('list');
                 setSelectedCustomer(null);
               }}
+              className="w-fit"
             >
               <ArrowLeft className="mr-2 size-4" />
               Back to Customers
             </Button>
-            <div>
-              <h3 className="text-2xl font-bold">{selectedCustomer.name}</h3>
-              <p className="text-muted-foreground">Customer Details & Transaction History</p>
+            <div className="sm:ml-4">
+              <h3 className="text-xl font-bold sm:text-2xl">{selectedCustomer.name}</h3>
+              <p className="text-sm text-muted-foreground">
+                Customer Details & Transaction History
+              </p>
             </div>
           </div>
-          <Button onClick={() => handleDownloadPDF(selectedCustomer)} className="ml-auto">
+          <Button onClick={() => handleDownloadPDF(selectedCustomer)} className="w-fit sm:ml-auto">
             <Download className="mr-2 size-4" />
             Download PDF
           </Button>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2 md:gap-6">
           {/* Customer Information Card */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <User className="size-5" />
+            <CardHeader className="pb-3 md:pb-4">
+              <CardTitle className="flex items-center space-x-2 text-base md:text-lg">
+                <User className="size-4 md:size-5" />
                 <span>Customer Information</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <User className="size-4 text-muted-foreground" />
-                  <span className="font-medium">Name:</span>
-                  <span>{selectedCustomer.name}</span>
+            <CardContent className="space-y-3 md:space-y-4">
+              <div className="space-y-2 md:space-y-3">
+                <div className="flex items-start space-x-2">
+                  <User className="mt-0.5 size-3 text-muted-foreground md:size-4" />
+                  <div className="flex-1">
+                    <span className="text-xs font-medium md:text-sm">Name:</span>
+                    <div className="text-sm md:text-base">{selectedCustomer.name}</div>
+                  </div>
                 </div>
                 {selectedCustomer.phone && (
-                  <div className="flex items-center space-x-2">
-                    <Phone className="size-4 text-muted-foreground" />
-                    <span className="font-medium">Phone:</span>
-                    <span>{selectedCustomer.phone}</span>
+                  <div className="flex items-start space-x-2">
+                    <Phone className="mt-0.5 size-3 text-muted-foreground md:size-4" />
+                    <div className="flex-1">
+                      <span className="text-xs font-medium md:text-sm">Phone:</span>
+                      <div className="text-sm md:text-base">{selectedCustomer.phone}</div>
+                    </div>
                   </div>
                 )}
                 {selectedCustomer.email && (
-                  <div className="flex items-center space-x-2">
-                    <Mail className="size-4 text-muted-foreground" />
-                    <span className="font-medium">Email:</span>
-                    <span>{selectedCustomer.email}</span>
+                  <div className="flex items-start space-x-2">
+                    <Mail className="mt-0.5 size-3 text-muted-foreground md:size-4" />
+                    <div className="flex-1">
+                      <span className="text-xs font-medium md:text-sm">Email:</span>
+                      <div className="break-all text-sm md:text-base">{selectedCustomer.email}</div>
+                    </div>
                   </div>
                 )}
                 {selectedCustomer.address && (
-                  <div className="flex items-center space-x-2">
-                    <MapPin className="size-4 text-muted-foreground" />
-                    <span className="font-medium">Address:</span>
-                    <span>{selectedCustomer.address}</span>
+                  <div className="flex items-start space-x-2">
+                    <MapPin className="mt-0.5 size-3 text-muted-foreground md:size-4" />
+                    <div className="flex-1">
+                      <span className="text-xs font-medium md:text-sm">Address:</span>
+                      <div className="text-sm md:text-base">{selectedCustomer.address}</div>
+                    </div>
                   </div>
                 )}
                 {selectedCustomer.notes && (
-                  <div className="flex items-center space-x-2">
-                    <FileText className="size-4 text-muted-foreground" />
-                    <span className="font-medium">Notes:</span>
-                    <span>{selectedCustomer.notes}</span>
+                  <div className="flex items-start space-x-2">
+                    <FileText className="mt-0.5 size-3 text-muted-foreground md:size-4" />
+                    <div className="flex-1">
+                      <span className="text-xs font-medium md:text-sm">Notes:</span>
+                      <div className="text-sm md:text-base">{selectedCustomer.notes}</div>
+                    </div>
                   </div>
                 )}
-                <div className="flex items-center space-x-2">
-                  <Calendar className="size-4 text-muted-foreground" />
-                  <span className="font-medium">Customer Since:</span>
-                  <span>{format(new Date(selectedCustomer.created_at), 'MMM dd, yyyy')}</span>
+                <div className="flex items-start space-x-2">
+                  <Calendar className="mt-0.5 size-3 text-muted-foreground md:size-4" />
+                  <div className="flex-1">
+                    <span className="text-xs font-medium md:text-sm">Customer Since:</span>
+                    <div className="text-sm md:text-base">
+                      {format(new Date(selectedCustomer.created_at), 'MMM dd, yyyy')}
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -236,44 +253,46 @@ export function DatabaseTab() {
 
           {/* Financial Summary Card */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <IndianRupee className="size-5" />
+            <CardHeader className="pb-3 md:pb-4">
+              <CardTitle className="flex items-center space-x-2 text-base md:text-lg">
+                <IndianRupee className="size-4 md:size-5" />
                 <span>Financial Summary</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid gap-4">
+            <CardContent className="space-y-3 md:space-y-4">
+              <div className="grid gap-3 md:gap-4">
                 <div className="flex items-center justify-between rounded-lg bg-red-50 p-3 dark:bg-red-950/20">
                   <div className="flex items-center space-x-2">
-                    <TrendingUp className="size-4 text-red-600" />
-                    <span className="font-medium text-red-700 dark:text-red-300">Total Credit</span>
+                    <TrendingUp className="size-3 text-red-600 md:size-4" />
+                    <span className="text-xs font-medium text-red-700 dark:text-red-300 md:text-sm">
+                      Total Credit
+                    </span>
                   </div>
-                  <span className="text-xl font-bold text-red-600">
+                  <span className="text-lg font-bold text-red-600 md:text-xl">
                     {formatCurrency(selectedCustomer.total_credit || 0)}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between rounded-lg bg-green-50 p-3 dark:bg-green-950/20">
                   <div className="flex items-center space-x-2">
-                    <TrendingDown className="size-4 text-green-600" />
-                    <span className="font-medium text-green-700 dark:text-green-300">
+                    <TrendingDown className="size-3 text-green-600 md:size-4" />
+                    <span className="text-xs font-medium text-green-700 dark:text-green-300 md:text-sm">
                       Total Paid
                     </span>
                   </div>
-                  <span className="text-xl font-bold text-green-600">
+                  <span className="text-lg font-bold text-green-600 md:text-xl">
                     {formatCurrency(selectedCustomer.total_paid || 0)}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between rounded-lg bg-blue-50 p-3 dark:bg-blue-950/20">
                   <div className="flex items-center space-x-2">
-                    <IndianRupee className="size-4 text-blue-600" />
-                    <span className="font-medium text-blue-700 dark:text-blue-300">
+                    <IndianRupee className="size-3 text-blue-600 md:size-4" />
+                    <span className="text-xs font-medium text-blue-700 dark:text-blue-300 md:text-sm">
                       Outstanding Balance
                     </span>
                   </div>
-                  <span className="text-xl font-bold text-blue-600">
+                  <span className="text-lg font-bold text-blue-600 md:text-xl">
                     {formatCurrency(selectedCustomer.balance || 0)}
                   </span>
                 </div>
@@ -284,67 +303,65 @@ export function DatabaseTab() {
 
         {/* Transaction History */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Clock className="size-5" />
+          <CardHeader className="pb-3 md:pb-4">
+            <CardTitle className="flex items-center space-x-2 text-base md:text-lg">
+              <Clock className="size-4 md:size-5" />
               <span>Transaction History</span>
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs md:text-sm">
               Complete history of all transactions for this customer
             </CardDescription>
           </CardHeader>
           <CardContent>
             {selectedCustomer.transactions.length === 0 ? (
-              <div className="py-8 text-center text-muted-foreground">
+              <div className="py-6 text-center text-sm text-muted-foreground md:py-8">
                 No transactions found for this customer
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Description</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {selectedCustomer.transactions.map((transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell>
-                        {format(new Date(transaction.transaction_date), 'MMM dd, yyyy HH:mm')}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={transaction.type === 'CREDIT' ? 'destructive' : 'default'}
-                          className={
-                            transaction.type === 'CREDIT'
-                              ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                              : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                          }
-                        >
-                          {transaction.type === 'CREDIT' ? 'Credit Given' : 'Payment Received'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={
-                            transaction.type === 'CREDIT'
-                              ? 'font-semibold text-red-600'
-                              : 'font-semibold text-green-600'
-                          }
-                        >
-                          {transaction.type === 'CREDIT' ? '-' : '+'}
-                          {formatCurrency(transaction.amount)}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {transaction.description || 'No description'}
-                      </TableCell>
+              <div className="-mx-2 overflow-x-auto sm:mx-0">
+                <Table className="min-w-[600px] text-xs md:text-sm">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="p-2 md:px-4">Date</TableHead>
+                      <TableHead className="p-2 md:px-4">Type</TableHead>
+                      <TableHead className="p-2 md:px-4">Amount</TableHead>
+                      <TableHead className="p-2 md:px-4">Description</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {selectedCustomer.transactions.map((transaction) => (
+                      <TableRow key={transaction.id}>
+                        <TableCell className="p-2 md:px-4">
+                          {format(new Date(transaction.transaction_date), 'MMM dd, yyyy HH:mm')}
+                        </TableCell>
+                        <TableCell className="p-2 md:px-4">
+                          <Badge
+                            variant={transaction.type === 'CREDIT' ? 'destructive' : 'default'}
+                            className="text-xs md:text-sm"
+                          >
+                            {transaction.type === 'CREDIT' ? 'Credit Given' : 'Payment Received'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="p-2 md:px-4">
+                          <span
+                            className={
+                              transaction.type === 'CREDIT'
+                                ? 'font-semibold text-red-600'
+                                : 'font-semibold text-green-600'
+                            }
+                          >
+                            {transaction.type === 'CREDIT' ? '-' : '+'}
+                            {formatCurrency(transaction.amount)}
+                          </span>
+                        </TableCell>
+                        <TableCell className="p-2 text-muted-foreground md:px-4">
+                          {transaction.description || 'No description'}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>
