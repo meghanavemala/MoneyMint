@@ -1,4 +1,3 @@
-```markdown
 # 💸 MoneyMint – Finance Tracking App for Moneylenders
 
 MoneyMint is a modern and user-friendly finance tracking web application designed specifically for moneylenders to track customer loans, payments, balances, and daily collections. Inspired by apps like Khata Book, it provides a powerful yet simple way to manage financial transactions, all stored securely using **Supabase** and accessible via **desktop** and **mobile** devices.
