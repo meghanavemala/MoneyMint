@@ -353,17 +353,17 @@ export function DatabaseTab() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Overview Cards */}
       <div className="flex w-full justify-center">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-          <Card className="mx-auto flex aspect-square max-w-[220px] flex-col justify-between rounded-xl p-2 shadow-md md:p-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 md:gap-6">
+          <Card className="mx-auto flex aspect-square max-w-[180px] flex-col justify-between rounded-xl p-2 shadow-md sm:max-w-[200px] md:max-w-[220px] md:p-4">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 md:pb-2">
               <CardTitle className="text-xs font-semibold md:text-sm">Total Outstanding</CardTitle>
-              <IndianRupee className="size-4 text-muted-foreground" />
+              <IndianRupee className="size-3 text-muted-foreground md:size-4" />
             </CardHeader>
             <CardContent className="pb-2 md:pb-4">
-              <div className="text-lg font-bold text-red-600 md:text-xl">
+              <div className="text-base font-bold text-red-600 md:text-lg lg:text-xl">
                 {formatCurrency(totalBalance)}
               </div>
               <p className="text-xs text-muted-foreground">
@@ -371,23 +371,25 @@ export function DatabaseTab() {
               </p>
             </CardContent>
           </Card>
-          <Card className="mx-auto flex aspect-square max-w-[220px] flex-col justify-between rounded-xl p-2 shadow-md md:p-4">
+          <Card className="mx-auto flex aspect-square max-w-[180px] flex-col justify-between rounded-xl p-2 shadow-md sm:max-w-[200px] md:max-w-[220px] md:p-4">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 md:pb-2">
               <CardTitle className="text-xs font-semibold md:text-sm">Total Credit Given</CardTitle>
-              <TrendingUp className="size-4 text-muted-foreground" />
+              <TrendingUp className="size-3 text-muted-foreground md:size-4" />
             </CardHeader>
             <CardContent className="pb-2 md:pb-4">
-              <div className="text-lg font-bold md:text-xl">{formatCurrency(totalCredit)}</div>
+              <div className="text-base font-bold md:text-lg lg:text-xl">
+                {formatCurrency(totalCredit)}
+              </div>
               <p className="text-xs text-muted-foreground">Total amount lent to customers</p>
             </CardContent>
           </Card>
-          <Card className="mx-auto flex aspect-square max-w-[220px] flex-col justify-between rounded-xl p-2 shadow-md md:p-4">
+          <Card className="mx-auto flex aspect-square max-w-[180px] flex-col justify-between rounded-xl p-2 shadow-md sm:max-w-[200px] md:max-w-[220px] md:p-4">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 md:pb-2">
               <CardTitle className="text-xs font-semibold md:text-sm">Total Collected</CardTitle>
-              <TrendingDown className="size-4 text-muted-foreground" />
+              <TrendingDown className="size-3 text-muted-foreground md:size-4" />
             </CardHeader>
             <CardContent className="pb-2 md:pb-4">
-              <div className="text-lg font-bold text-green-600 md:text-xl">
+              <div className="text-base font-bold text-green-600 md:text-lg lg:text-xl">
                 {formatCurrency(totalPaid)}
               </div>
               <p className="text-xs text-muted-foreground">Total payments received</p>
@@ -396,11 +398,11 @@ export function DatabaseTab() {
         </div>
       </div>
       {/* Customer List */}
-      <Card className="mb-8 rounded-xl shadow-md">
+      <Card className="mb-4 rounded-xl shadow-md md:mb-8">
         <CardHeader className="pb-2 md:pb-4">
           <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
             <div>
-              <CardTitle className="text-base font-semibold md:text-lg">
+              <CardTitle className="text-sm font-semibold md:text-base lg:text-lg">
                 Customer Database
               </CardTitle>
               <CardDescription className="text-xs md:text-sm">
@@ -422,37 +424,39 @@ export function DatabaseTab() {
         </CardHeader>
         <CardContent className="pb-2 md:pb-4">
           {filteredCustomers.length === 0 ? (
-            <div className="py-8 text-center text-xs text-muted-foreground md:text-sm">
+            <div className="py-6 text-center text-xs text-muted-foreground md:py-8 md:text-sm">
               {searchTerm
                 ? 'No customers found matching your search'
                 : 'No customers found. Add your first customer in the Add Entry tab.'}
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="-mx-2 overflow-x-auto sm:mx-0">
               <Table className="min-w-[600px] text-xs md:text-sm">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>Credit Given</TableHead>
-                    <TableHead>Paid</TableHead>
-                    <TableHead>Balance</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="p-2 md:px-4">Customer</TableHead>
+                    <TableHead className="p-2 md:px-4">Contact</TableHead>
+                    <TableHead className="p-2 md:px-4">Credit Given</TableHead>
+                    <TableHead className="p-2 md:px-4">Paid</TableHead>
+                    <TableHead className="p-2 md:px-4">Balance</TableHead>
+                    <TableHead className="p-2 md:px-4">Status</TableHead>
+                    <TableHead className="p-2 md:px-4">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredCustomers.map((customer) => (
                     <TableRow key={customer.id} className="transition-colors hover:bg-muted/30">
-                      <TableCell>
+                      <TableCell className="p-2 md:px-4">
                         <div>
-                          <div className="text-sm font-medium md:text-base">{customer.name}</div>
+                          <div className="text-xs font-medium md:text-sm lg:text-base">
+                            {customer.name}
+                          </div>
                           <div className="text-xs text-muted-foreground">
                             Since {format(new Date(customer.created_at), 'MMM yyyy')}
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="p-2 md:px-4">
                         <div className="space-y-1">
                           {customer.phone && (
                             <div className="flex items-center space-x-1 text-xs">
@@ -463,41 +467,41 @@ export function DatabaseTab() {
                           {customer.email && (
                             <div className="flex items-center space-x-1 text-xs text-muted-foreground">
                               <Mail className="size-3" />
-                              <span>{customer.email}</span>
+                              <span className="truncate">{customer.email}</span>
                             </div>
                           )}
                         </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="p-2 md:px-4">
                         <span className="text-xs font-medium text-red-600 md:text-sm">
                           {formatCurrency(customer.total_credit || 0)}
                         </span>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="p-2 md:px-4">
                         <span className="text-xs font-medium text-green-600 md:text-sm">
                           {formatCurrency(customer.total_paid || 0)}
                         </span>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="p-2 md:px-4">
                         <span
                           className={`text-xs font-bold md:text-sm ${(customer.balance || 0) > 0 ? 'text-red-600' : 'text-green-600'}`}
                         >
                           {formatCurrency(customer.balance || 0)}
                         </span>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="p-2 md:px-4">
                         <Badge
                           variant={customer.is_active ? 'default' : 'secondary'}
-                          className="rounded-full px-3 py-1 text-xs md:text-sm"
+                          className="rounded-full px-2 py-1 text-xs md:text-sm"
                         >
                           {customer.is_active ? 'Active' : 'Inactive'}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="p-2 md:px-4">
                         <Button
                           variant="outline"
                           size="sm"
-                          className="rounded-lg px-3 py-1 text-xs md:text-sm"
+                          className="h-auto rounded-lg px-2 py-1 text-xs md:text-sm"
                           onClick={() => loadCustomerDetails(customer.id)}
                           disabled={customerDetailsLoading}
                         >

@@ -15,35 +15,35 @@ export default async function DashboardPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <DashboardHeader />
-      <div className="flex-1 px-2 py-4 sm:px-6 md:px-12 md:py-8">
-        <Tabs defaultValue="database" className="space-y-6 md:space-y-8">
-          <TabsList className="no-scrollbar mb-4 flex w-full justify-center gap-2 rounded-lg md:mb-6 md:gap-4">
+      <div className="flex-1 p-2 sm:px-4 md:px-8 md:py-6 lg:px-12 lg:py-8">
+        <Tabs defaultValue="database" className="space-y-4 md:space-y-6">
+          <TabsList className="no-scrollbar mb-2 flex w-full gap-1 overflow-x-auto rounded-lg md:mb-4 md:gap-2">
             <TabsTrigger
               value="database"
-              className="flex min-w-[180px] max-w-[220px] items-center justify-center space-x-2 whitespace-nowrap px-4 py-2 text-base md:text-lg"
+              className="flex min-w-[140px] items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm md:min-w-[160px] md:text-base lg:min-w-[180px] lg:text-lg"
             >
               <span>Customer Dashboard</span>
             </TabsTrigger>
             <TabsTrigger
               value="add-entry"
-              className="flex min-w-[180px] max-w-[220px] items-center justify-center space-x-2 whitespace-nowrap px-4 py-2 text-base md:text-lg"
+              className="flex min-w-[140px] items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm md:min-w-[160px] md:text-base lg:min-w-[180px] lg:text-lg"
             >
               <span>Add Entry</span>
             </TabsTrigger>
             <TabsTrigger
               value="daily-collection"
-              className="flex min-w-[180px] max-w-[220px] items-center justify-center space-x-2 whitespace-nowrap px-4 py-2 text-base md:text-lg"
+              className="flex min-w-[140px] items-center justify-center whitespace-nowrap rounded-md px-3 py-2 text-sm md:min-w-[160px] md:text-base lg:min-w-[180px] lg:text-lg"
             >
               <span>Daily Collection</span>
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="database" className="space-y-6 md:space-y-8">
+          <TabsContent value="database" className="space-y-4 md:space-y-6">
             <DatabaseTab />
           </TabsContent>
-          <TabsContent value="add-entry" className="space-y-6 md:space-y-8">
+          <TabsContent value="add-entry" className="space-y-4 md:space-y-6">
             <AddEntryTab />
           </TabsContent>
-          <TabsContent value="daily-collection" className="space-y-6 md:space-y-8">
+          <TabsContent value="daily-collection" className="space-y-4 md:space-y-6">
             <DailyCollectionTab />
           </TabsContent>
         </Tabs>
