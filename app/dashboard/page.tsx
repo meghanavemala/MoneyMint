@@ -15,37 +15,35 @@ export default async function DashboardPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <DashboardHeader />
-
-      <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
-        <div className="flex items-center justify-between space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight">Digital Khata Dashboard</h2>
-          <div className="text-sm text-muted-foreground">
-            Manage your customers, transactions, and collections
-          </div>
-        </div>
-
-        <Tabs defaultValue="database" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="database" className="flex items-center space-x-2">
-              <span>Khata Overview</span>
+      <div className="flex-1 px-2 py-4 sm:px-6 md:px-12 md:py-8">
+        <Tabs defaultValue="database" className="space-y-6 md:space-y-8">
+          <TabsList className="no-scrollbar mb-4 flex w-full justify-center gap-2 rounded-lg md:mb-6 md:gap-4">
+            <TabsTrigger
+              value="database"
+              className="flex min-w-[180px] max-w-[220px] items-center justify-center space-x-2 whitespace-nowrap px-4 py-2 text-base md:text-lg"
+            >
+              <span>Customer Dashboard</span>
             </TabsTrigger>
-            <TabsTrigger value="add-entry" className="flex items-center space-x-2">
+            <TabsTrigger
+              value="add-entry"
+              className="flex min-w-[180px] max-w-[220px] items-center justify-center space-x-2 whitespace-nowrap px-4 py-2 text-base md:text-lg"
+            >
               <span>Add Entry</span>
             </TabsTrigger>
-            <TabsTrigger value="daily-collection" className="flex items-center space-x-2">
+            <TabsTrigger
+              value="daily-collection"
+              className="flex min-w-[180px] max-w-[220px] items-center justify-center space-x-2 whitespace-nowrap px-4 py-2 text-base md:text-lg"
+            >
               <span>Daily Collection</span>
             </TabsTrigger>
           </TabsList>
-
-          <TabsContent value="database" className="space-y-4">
+          <TabsContent value="database" className="space-y-6 md:space-y-8">
             <DatabaseTab />
           </TabsContent>
-
-          <TabsContent value="add-entry" className="space-y-4">
+          <TabsContent value="add-entry" className="space-y-6 md:space-y-8">
             <AddEntryTab />
           </TabsContent>
-
-          <TabsContent value="daily-collection" className="space-y-4">
+          <TabsContent value="daily-collection" className="space-y-6 md:space-y-8">
             <DailyCollectionTab />
           </TabsContent>
         </Tabs>

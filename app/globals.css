@@ -8,74 +8,114 @@ Global styles for the app.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+    /* Base Colors */
+    --background: 0 0% 100%; /* White */
+    --foreground: 0 0% 10%; /* Dark gray for text */
+    
+    /* Card & Popover */
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 0 0% 10%; /* Dark gray */
+    --popover: 0 0% 100%; /* White */
+    --popover-foreground: 0 0% 10%; /* Dark gray */
+    
+    /* Primary - Green shades */
+    --primary: 150 80% 35%; /* Primary green */
+    --primary-foreground: 0 0% 100%; /* White */
+    
+    /* Secondary - Lighter green */
+    --secondary: 150 50% 90%; /* Very light green */
+    --secondary-foreground: 0 0% 10%; /* Dark gray */
+    
+    /* Muted - Light gray */
+    --muted: 0 0% 97%; /* Off-white */
+    --muted-foreground: 0 0% 40%; /* Medium gray */
+    
+    /* Accent - Slightly darker green */
+    --accent: 150 60% 25%; /* Darker green */
+    --accent-foreground: 0 0% 100%; /* White */
+    
+    /* Destructive - Red */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Borders & Inputs */
+    --border: 0 0% 90%; /* Light gray */
+    --input: 0 0% 90%; /* Light gray */
+    --ring: 150 80% 35%; /* Match primary green */
+    
+    /* Border radius */
     --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Chart colors - Green shades */
+    --chart-1: 150 80% 35%; /* Primary green */
+    --chart-2: 150 60% 45%; /* Lighter green */
+    --chart-3: 150 40% 55%; /* Even lighter green */
+    --chart-4: 150 70% 30%; /* Darker green */
+    --chart-5: 150 50% 25%; /* Darkest green */
+    
+    /* Sidebar */
+    --sidebar-background: 0 0% 98%; /* Off-white */
+    --sidebar-foreground: 0 0% 20%; /* Dark gray */
+    --sidebar-primary: 150 80% 35%; /* Primary green */
+    --sidebar-primary-foreground: 0 0% 100%; /* White */
+    --sidebar-accent: 150 50% 95%; /* Very light green */
+    --sidebar-accent-foreground: 0 0% 10%; /* Dark gray */
+    --sidebar-border: 0 0% 90%; /* Light gray */
+    --sidebar-ring: 150 80% 35%; /* Primary green */
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Base Colors - Dark theme */
+    --background: 0 0% 5%; /* Very dark gray */
+    --foreground: 0 0% 95%; /* Off-white */
+    
+    /* Card & Popover */
+    --card: 0 0% 8%; /* Dark gray */
+    --card-foreground: 0 0% 95%; /* Off-white */
+    --popover: 0 0% 8%; /* Dark gray */
+    --popover-foreground: 0 0% 95%; /* Off-white */
+    
+    /* Primary - Brighter green for dark mode */
+    --primary: 150 90% 40%; /* Brighter green */
+    --primary-foreground: 0 0% 5%; /* Very dark gray */
+    
+    /* Secondary - Darker green */
+    --secondary: 150 30% 15%; /* Dark green */
+    --secondary-foreground: 0 0% 95%; /* Off-white */
+    
+    /* Muted - Dark gray */
+    --muted: 0 0% 12%; /* Dark gray */
+    --muted-foreground: 0 0% 65%; /* Medium gray */
+    
+    /* Accent - Slightly lighter green */
+    --accent: 150 50% 25%; /* Dark green */
+    --accent-foreground: 0 0% 95%; /* Off-white */
+    
+    /* Destructive - Red */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Borders & Inputs */
+    --border: 0 0% 18%; /* Dark gray */
+    --input: 0 0% 18%; /* Dark gray */
+    --ring: 150 90% 40%; /* Match primary green */
+    
+    /* Chart colors - Green shades */
+    --chart-1: 150 90% 40%; /* Primary green */
+    --chart-2: 150 70% 50%; /* Lighter green */
+    --chart-3: 150 50% 60%; /* Even lighter green */
+    --chart-4: 150 80% 35%; /* Darker green */
+    --chart-5: 150 60% 30%; /* Darkest green */
+    
+    /* Sidebar - Dark theme */
+    --sidebar-background: 0 0% 8%; /* Dark gray */
+    --sidebar-foreground: 0 0% 90%; /* Light gray */
+    --sidebar-primary: 150 90% 40%; /* Brighter green */
+    --sidebar-primary-foreground: 0 0% 5%; /* Very dark gray */
+    --sidebar-accent: 150 30% 15%; /* Dark green */
+    --sidebar-accent-foreground: 0 0% 90%; /* Light gray */
+    --sidebar-border: 0 0% 18%; /* Dark gray */
+    --sidebar-ring: 150 90% 40%; /* Brighter green */
   }
 }
 
@@ -85,5 +125,24 @@ Global styles for the app.
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  @keyframes drop {
+    0% {
+      transform: translateY(-40px) scale(1) rotate(-10deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.2;
+    }
+    100% {
+      transform: translateY(110vh) scale(1.1) rotate(10deg);
+      opacity: 0;
+    }
+  }
+  .animate-drop {
+    animation: drop 3.5s linear infinite;
   }
 }

@@ -112,7 +112,7 @@ export function DailyCollectionTab() {
         dailyData.transactions,
         dailyData.totalCollection,
         {
-          businessName: 'Sandeep Finance',
+          businessName: 'MoneyMint',
         }
       );
       toast.success('PDF downloaded successfully');

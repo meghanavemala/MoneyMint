@@ -16,9 +16,9 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Sandeep Finance - Digital Khata Book',
+  title: 'MoneyMint - Personal Finance Tracker',
   description:
-    'Modern digital khata book for Indian money lenders. Track customers, transactions, and daily collections in Rupees.',
+    'Track your expenses, manage your budget, and take control of your finances with MoneyMint. The modern way to manage your money.',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

@@ -1,4 +1,4 @@
-# Sandeep Finance - Setup Guide
+# MoneyMint - Setup Guide
 
 ## Prerequisites
 

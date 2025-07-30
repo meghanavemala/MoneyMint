@@ -124,7 +124,7 @@ export function DatabaseTab() {
     try {
       const { generateCustomerPDF } = await import('@/lib/utils/pdf-generator');
       await generateCustomerPDF(customer, {
-        businessName: 'Sandeep Finance',
+        businessName: 'MoneyMint',
         includeBalance: true,
       });
       toast.success('PDF downloaded successfully');
@@ -355,149 +355,160 @@ export function DatabaseTab() {
   return (
     <div className="space-y-6">
       {/* Overview Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Outstanding</CardTitle>
-            <IndianRupee className="size-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{formatCurrency(totalBalance)}</div>
-            <p className="text-xs text-muted-foreground">
-              Amount to be collected from all customers
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Credit Given</CardTitle>
-            <TrendingUp className="size-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalCredit)}</div>
-            <p className="text-xs text-muted-foreground">Total amount lent to customers</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Collected</CardTitle>
-            <TrendingDown className="size-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{formatCurrency(totalPaid)}</div>
-            <p className="text-xs text-muted-foreground">Total payments received</p>
-          </CardContent>
-        </Card>
+      <div className="flex w-full justify-center">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+          <Card className="mx-auto flex aspect-square max-w-[220px] flex-col justify-between rounded-xl p-2 shadow-md md:p-4">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 md:pb-2">
+              <CardTitle className="text-xs font-semibold md:text-sm">Total Outstanding</CardTitle>
+              <IndianRupee className="size-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent className="pb-2 md:pb-4">
+              <div className="text-lg font-bold text-red-600 md:text-xl">
+                {formatCurrency(totalBalance)}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Amount to be collected from all customers
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="mx-auto flex aspect-square max-w-[220px] flex-col justify-between rounded-xl p-2 shadow-md md:p-4">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 md:pb-2">
+              <CardTitle className="text-xs font-semibold md:text-sm">Total Credit Given</CardTitle>
+              <TrendingUp className="size-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent className="pb-2 md:pb-4">
+              <div className="text-lg font-bold md:text-xl">{formatCurrency(totalCredit)}</div>
+              <p className="text-xs text-muted-foreground">Total amount lent to customers</p>
+            </CardContent>
+          </Card>
+          <Card className="mx-auto flex aspect-square max-w-[220px] flex-col justify-between rounded-xl p-2 shadow-md md:p-4">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 md:pb-2">
+              <CardTitle className="text-xs font-semibold md:text-sm">Total Collected</CardTitle>
+              <TrendingDown className="size-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent className="pb-2 md:pb-4">
+              <div className="text-lg font-bold text-green-600 md:text-xl">
+                {formatCurrency(totalPaid)}
+              </div>
+              <p className="text-xs text-muted-foreground">Total payments received</p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-
       {/* Customer List */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
+      <Card className="mb-8 rounded-xl shadow-md">
+        <CardHeader className="pb-2 md:pb-4">
+          <div className="flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
             <div>
-              <CardTitle>Customer Database</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-base font-semibold md:text-lg">
+                Customer Database
+              </CardTitle>
+              <CardDescription className="text-xs md:text-sm">
                 Manage your customers and view their transaction history
               </CardDescription>
             </div>
-            <div className="flex items-center space-x-2">
-              <div className="relative">
+            <div className="flex w-full items-center sm:w-auto">
+              <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Search customers..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-64 pl-10"
+                  className="w-full rounded-lg pl-10 text-sm"
                 />
               </div>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pb-2 md:pb-4">
           {filteredCustomers.length === 0 ? (
-            <div className="py-8 text-center text-muted-foreground">
+            <div className="py-8 text-center text-xs text-muted-foreground md:text-sm">
               {searchTerm
                 ? 'No customers found matching your search'
                 : 'No customers found. Add your first customer in the Add Entry tab.'}
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Contact</TableHead>
-                  <TableHead>Credit Given</TableHead>
-                  <TableHead>Paid</TableHead>
-                  <TableHead>Balance</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredCustomers.map((customer) => (
-                  <TableRow key={customer.id}>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{customer.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          Since {format(new Date(customer.created_at), 'MMM yyyy')}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        {customer.phone && (
-                          <div className="flex items-center space-x-1 text-sm">
-                            <Phone className="size-3" />
-                            <span>{customer.phone}</span>
-                          </div>
-                        )}
-                        {customer.email && (
-                          <div className="flex items-center space-x-1 text-sm text-muted-foreground">
-                            <Mail className="size-3" />
-                            <span>{customer.email}</span>
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-medium text-red-600">
-                        {formatCurrency(customer.total_credit || 0)}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-medium text-green-600">
-                        {formatCurrency(customer.total_paid || 0)}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`font-bold ${(customer.balance || 0) > 0 ? 'text-red-600' : 'text-green-600'}`}
-                      >
-                        {formatCurrency(customer.balance || 0)}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={customer.is_active ? 'default' : 'secondary'}>
-                        {customer.is_active ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => loadCustomerDetails(customer.id)}
-                        disabled={customerDetailsLoading}
-                      >
-                        View Details
-                      </Button>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table className="min-w-[600px] text-xs md:text-sm">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Contact</TableHead>
+                    <TableHead>Credit Given</TableHead>
+                    <TableHead>Paid</TableHead>
+                    <TableHead>Balance</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredCustomers.map((customer) => (
+                    <TableRow key={customer.id} className="transition-colors hover:bg-muted/30">
+                      <TableCell>
+                        <div>
+                          <div className="text-sm font-medium md:text-base">{customer.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            Since {format(new Date(customer.created_at), 'MMM yyyy')}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          {customer.phone && (
+                            <div className="flex items-center space-x-1 text-xs">
+                              <Phone className="size-3" />
+                              <span>{customer.phone}</span>
+                            </div>
+                          )}
+                          {customer.email && (
+                            <div className="flex items-center space-x-1 text-xs text-muted-foreground">
+                              <Mail className="size-3" />
+                              <span>{customer.email}</span>
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-xs font-medium text-red-600 md:text-sm">
+                          {formatCurrency(customer.total_credit || 0)}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-xs font-medium text-green-600 md:text-sm">
+                          {formatCurrency(customer.total_paid || 0)}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`text-xs font-bold md:text-sm ${(customer.balance || 0) > 0 ? 'text-red-600' : 'text-green-600'}`}
+                        >
+                          {formatCurrency(customer.balance || 0)}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={customer.is_active ? 'default' : 'secondary'}
+                          className="rounded-full px-3 py-1 text-xs md:text-sm"
+                        >
+                          {customer.is_active ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-lg px-3 py-1 text-xs md:text-sm"
+                          onClick={() => loadCustomerDetails(customer.id)}
+                          disabled={customerDetailsLoading}
+                        >
+                          View Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
